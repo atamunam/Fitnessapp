@@ -1,0 +1,29 @@
+<h1>Listing challenges made to you</h1>
+<p id="notice"><%= notice %></p>
+<% if !@challenges_to_me.blank? %>
+<table>
+  <tr>
+    <th>Challenger name</th>
+    <th>Challenger Email</th>
+    <th>Reward point</th>
+    <th>Actions</th>
+    <th></th>
+  </tr>
+
+<% @challenges_to_me.each do |challenge| %>
+  <tr>
+    <td><%= challenge.user.username %></td>
+    <td><%= challenge.user.email %></td>
+    <td><%= challenge.points %></td>
+    <td><%= link_to 'Accept', accept_challenge_users_path(:challenege_id => challenge.id) %></td>
+    <td></td>
+  </tr>
+<% end %>
+</table>
+<% else %>
+<h3> You do not have any challenges to compete</h1>
+<% end %>
+
+<br />
+
+<%#= link_to 'New User', new_user_path %>

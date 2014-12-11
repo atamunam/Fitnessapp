@@ -1,0 +1,25 @@
+<h1>Listing users</h1>
+<p id="notice"><%= notice %></p>
+<table>
+  <tr>
+    <th>Username</th>
+    <th>Email</th>
+    <th>Reward Points</th>
+    <th>Points at stake</th>
+    <th></th>
+  </tr>
+
+<% @users.each do |user| %>
+  <tr>
+    <td><%= user.username %></td>
+    <td><%= user.email %></td>
+    <td><%= user.points %></td>
+    <td><%= user.points_at_stake %></td>
+    <td><%#= link_to 'Destroy', user, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New User', new_user_path %>
