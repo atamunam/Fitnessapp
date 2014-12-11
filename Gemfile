@@ -21,6 +21,7 @@ gem "less-rails"   # for twitter bootstrap
 gem 'will_paginate', '~> 3.0'
 gem 'will_paginate-bootstrap'
 gem 'therubyracer'
+gem 'rails_12factor', group: :production
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
