@@ -1,35 +1,50 @@
-<h1>Listing challenges</h1>
-
-<table>
+<h1>Listing Your challenges</h1>
+<% if !@challenges.blank? %>
+<% @challenges.each do |challenge| %>
+ <h3> <%= challenge.title %> ,
+<%= challenge.points %> points each </h3>
+ <% connected_users = UserChallenge.where(:challenge_id => challenge.id) %>
+ <% if !connected_users.blank? %>
+ <table>
   <thead>
     <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th>User</th>
-      <th>Start date</th>
-      <th>End date</th>
-      <th>Points</th>
-      <th colspan="3"></th>
+      <th>Name</th>
+      <th>Status/Actions</th>
     </tr>
   </thead>
-
+</table>
+<table>
   <tbody>
-    <% @challenges.each do |challenge| %>
-      <tr>
-        <td><%= challenge.title %></td>
-        <td><%= challenge.description %></td>
-        <td><%= challenge.user_id %></td>
-        <td><%= challenge.start_date %></td>
-        <td><%= challenge.end_date %></td>
-        <td><%= challenge.points %></td>
-        <td><%= link_to 'Show', challenge %></td>
-        <td><%= link_to 'Edit', edit_challenge_path(challenge) %></td>
-        <td><%= link_to 'Destroy', challenge, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-      </tr>
+ <% connected_users.each do |participant| %>
+ <% user = User.where(:id => participant.competitor_id).first %>
+ <tr>
+    <td><%= user.username if user.username.present? %></td>
+    <td>
+    <% if participant.is_approved == false %>
+      Lost
+    <% elsif participant.is_approved == true %>
+      Won
+    <% elsif participant.is_accepted == false %>
+      Rejected 
+    <% elsif participant.is_accepted == true && participant.is_completed == 'nil' %>
+      Accepted
+    <% elsif participant.is_accepted == true && participant.is_completed == true %>
+      <%= link_to 'Approve' , approve_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
+      <%= link_to 'Disapprove' , disapprove_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
+    
+    <% else %>
+      Pending request to join
     <% end %>
+    </td>
+    </tr>
+ <% end %>
   </tbody>
 </table>
+<% end %>
+<% end %>
+<% else %>
+<h3>No any challenges given by you</h3>
+<% end %>
 
-<br>
-
-<%= link_to 'New Challenge', new_challenge_path %>
+</br>
+<%= link_to 'Give a Challenge', new_challenge_path %>

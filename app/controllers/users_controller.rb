@@ -73,9 +73,11 @@ class UsersController < ApplicationController
 
   end
 
+  
+
   def accept_challenge
     @challenge = Challenge.find(params[:challenege_id])
-    @user_challenge = UserChallenge.where(:competitor_id => current_user.id,:challenge_id => @challenege.id).first
+    @user_challenge = UserChallenge.where(:competitor_id => current_user.id,:challenge_id => @challenge.id).first
     if current_user.points > @challenge.points
       reduce_points = current_user.points - @challenge.points
       add_stake_points = current_user.points_at_stake + @challenge.points
@@ -93,19 +95,34 @@ class UsersController < ApplicationController
 
   def complete_challenge
     @challenge = Challenge.find(params[:challenege_id])
-    @user_challenge = UserChallenge.where(:competitor_id => current_user.id,:challenege_id => @challenege.id).first
+    @user_challenge = UserChallenge.where(:competitor_id => current_user.id,:challenge_id => @challenge.id).first
     @user_challenge.update(:is_completed => true)
 
+
     flash[:notice] = "You have successfully completed this challenge"
+    redirect_to (:back)
+  end
+
+  def reject_challenge
+    @challenge = Challenge.find(params[:challenege_id])
+    @user_challenge = UserChallenge.where(:competitor_id => current_user.id,:challenge_id => @challenge.id).first
+    @user_challenge.update(:is_accepted => false)
+    
+    challenge_owner = User.find @user_challenge.user_id
+    user_points = challenge_owner.points + @challenge.points
+    user_stakes = challenge_owner.points_at_stake - @challenge.points
+    challenge_owner.update(:points => user_points, :points_at_stake => user_stakes)
+
+    flash[:notice] = "You have successfully rejected this challenge"
     redirect_to (:back)
   end
 
   def approve_challenge
     @challenge = Challenge.find(params[:challenge_id])
     @competitor = User.find(params[:competitor_id])
-    @user_challenge = UserChallenge.where(:competitor_id => @competitor.id,:challenege_id => @challenge.id).first
+    @user_challenge = UserChallenge.where(:competitor_id => @competitor.id,:challenge_id => @challenge.id).first
     @user_challenge.update(:is_approved => true)
-    competitor_points = @competitor.points + @challenge.points
+    competitor_points = @competitor.points + ( 2 * @challenge.points )
     competitor_stakes = @competitor.points_at_stake - @challenge.points
     @competitor.update(:points => competitor_points, :points_at_stake => competitor_stakes)
     user_stakes = current_user.points_at_stake - @challenge.points
@@ -115,15 +132,15 @@ class UsersController < ApplicationController
     redirect_to (:back)
   end
 
-  def reject_challenge
+  def disapprove_challenge
     @challenge = Challenge.find(params[:challenge_id])
     @competitor = User.find(params[:competitor_id])
-    @user_challenge = UserChallenge.where(:competitor_id => @competitor.id,:challenege_id => @challenge.id).first
+    @user_challenge = UserChallenge.where(:competitor_id => @competitor.id,:challenge_id => @challenge.id).first
     @user_challenge.update(:is_approved => false)
-    competitor_stakes = @competitor.points_at_stake - @challenge.points_at_stake
+    competitor_stakes = @competitor.points_at_stake - @challenge.points
     @competitor.update(:points_at_stake => competitor_stakes)
-    user_points = current_user.points + @challenge.points
-    user_stakes = current_user.points_at_stake - @challenge.points_at_stake
+    user_points = current_user.points + ( 2 * @challenge.points )
+    user_stakes = current_user.points_at_stake - @challenge.points
     current_user.update(:points => user_points, :points_at_stake => user_stakes)
 
     flash[:notice] = "You have successfully rejected this challenge"

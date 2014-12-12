@@ -1,4 +1,4 @@
-<h1>Listing challenges made to you</h1>
+<h1>Listing challenges given to you</h1>
 <p id="notice"><%= notice %></p>
 <% if !@challenges_to_me.blank? %>
 <table>
@@ -15,7 +15,23 @@
     <td><%= challenge.user.username %></td>
     <td><%= challenge.user.email %></td>
     <td><%= challenge.points %></td>
-    <td><%= link_to 'Accept', accept_challenge_users_path(:challenege_id => challenge.id) %></td>
+    <% challenge_status = UserChallenge.where(:challenge_id => challenge.id,:competitor_id => current_user.id).first %>
+    <td>
+      <% if challenge_status.is_approved == false %>
+       Lost
+      <% elsif challenge_status.is_approved == true %>
+       Won
+      <% elsif challenge_status.is_completed == true %>
+       Completed
+      <% elsif challenge_status.is_accepted == true %>
+        <%= link_to 'Completed', complete_challenge_users_path(:challenege_id => challenge.id) %>
+      <% elsif challenge_status.is_accepted == false %>
+       Rejected
+      <% else %>
+        <%= link_to 'Accept', accept_challenge_users_path(:challenege_id => challenge.id) %>
+        <%= link_to 'Reject', reject_challenge_users_path(:challenege_id => challenge.id) %>
+      <% end %>
+    </td>
     <td></td>
   </tr>
 <% end %>

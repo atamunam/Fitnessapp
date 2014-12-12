@@ -12,8 +12,11 @@
         <% if current_user %>
         <%= link_to "Edit Profile", edit_user_path(current_user.id)%>
         <%= link_to "Logout", :logout%>
+        <%= link_to "My challenges", challenges_path %>
+        <%= link_to "Challenges to me", given_challenge_users_path %>
+        <%= link_to "Users", users_path %>
         <% else %>
-        <%= link_to "Register", new_user_path%> | 
+        <%= link_to "Register", new_user_path%>  
         <%= link_to "Login", :login %>
         <% end %>
     </div>

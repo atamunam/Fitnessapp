@@ -8,13 +8,14 @@ Rails.application.routes.draw do
       get :complete_challenge
       get :approve_challenge
       get :reject_challenge
+      get :disapprove_challenge
     end
   end
   resources :user_sessions
   get 'login' => 'user_sessions#new', :as => :login
   get 'logout' => 'user_sessions#destroy', :as => :logout
 
-  root 'users#index'
+  root 'user_sessions#new'
 
 
   # The priority is based upon order of creation: first created -> highest priority.

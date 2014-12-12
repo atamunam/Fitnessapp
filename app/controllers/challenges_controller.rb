@@ -5,7 +5,7 @@ class ChallengesController < ApplicationController
   # GET /challenges
   # GET /challenges.json
   def index
-    @challenges = Challenge.all
+    @challenges = current_user.challenges
   end
 
   # GET /challenges/1
@@ -35,20 +35,27 @@ class ChallengesController < ApplicationController
   def create
     @challenge = Challenge.new(challenge_params)
     competitors = params[:challenge][:competitor_id].delete_if{ |x| x == "0" }
+    if competitors.blank?
+        flash[:notice] = "Please select atleast one user to challenge!!"
+        redirect_to new_challenge_path
+        return
+    end
     individual_points = params[:challenge][:points]
     total_points = individual_points.to_i * competitors.count
     available_points = current_user.points
     if !competitors.blank?
-      if total_points > available_points
+      if total_points.to_i > available_points.to_i
         flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to (:back)
+        redirect_to new_challenge_path
         return
       end
     else 
-      if individual_points > available_points
-        flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to (:back)
-        return
+      if !individual_points.blank?
+        if individual_points.to_i > available_points.to_i
+          flash[:notice] = "You do not have sufficient reward points to create a challenge!!"
+          redirect_to new_challenge_path
+          return
+        end
       end
     end    
     # binding.pry
@@ -86,16 +93,18 @@ class ChallengesController < ApplicationController
     total_points = individual_points.to_i * competitors.count
     available_points = current_user.points
     if !competitors.blank?
-      if total_points > available_points
+      if total_points.to_i > available_points.to_i
         flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to (:back)
+        redirect_to edit_challenge_path(@challenge.id)
         return
       end
     else 
-      if individual_points > available_points
-        flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to (:back)
-        return
+      if !individual_points.blank?
+        if individual_points.to_i > available_points.to_i
+          flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
+          redirect_to edit_challenge_path(@challenge.id)
+          return
+        end
       end
     end    
 
