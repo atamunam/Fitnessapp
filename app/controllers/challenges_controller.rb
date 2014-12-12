@@ -41,18 +41,12 @@ class ChallengesController < ApplicationController
         return
     end
     individual_points = params[:challenge][:points]
-    total_points = individual_points.to_i * competitors.count
+    # total_points = individual_points.to_i * competitors.count
     available_points = current_user.points
     if !competitors.blank?
-      if total_points.to_i > available_points.to_i
-        flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to new_challenge_path
-        return
-      end
-    else 
       if !individual_points.blank?
         if individual_points.to_i > available_points.to_i
-          flash[:notice] = "You do not have sufficient reward points to create a challenge!!"
+          flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
           redirect_to new_challenge_path
           return
         end
@@ -66,9 +60,9 @@ class ChallengesController < ApplicationController
           competitors.each do |competitor|
             UserChallenge.create(:user_id => current_user.id, :competitor_id => competitor, :challenge_id => @challenge.id)
           end
-          remaining_points = available_points - total_points 
+          remaining_points = available_points - individual_points.to_i 
           if current_user.points_at_stake != "0"
-            stake_points = current_user.points_at_stake + total_points
+            stake_points = current_user.points_at_stake + individual_points.to_i
           else
             stake_points = current_user.points_at_stake   
           end
@@ -90,15 +84,9 @@ class ChallengesController < ApplicationController
 
     competitors = params[:challenge][:competitor_id].delete_if{ |x| x == "0" }
     individual_points = params[:challenge][:points]
-    total_points = individual_points.to_i * competitors.count
+    # total_points = individual_points.to_i * competitors.count
     available_points = current_user.points
-    if !competitors.blank?
-      if total_points.to_i > available_points.to_i
-        flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
-        redirect_to edit_challenge_path(@challenge.id)
-        return
-      end
-    else 
+      
       if !individual_points.blank?
         if individual_points.to_i > available_points.to_i
           flash[:notice] = "You do not have sufficient reward points to challenge a competitor!!"
@@ -106,7 +94,6 @@ class ChallengesController < ApplicationController
           return
         end
       end
-    end    
 
     respond_to do |format|
       if @challenge.update(challenge_params)
@@ -114,9 +101,9 @@ class ChallengesController < ApplicationController
           competitors.each do |competitor|
             UserChallenge.create(:user_id => current_user.id, :competitor_id => competitor, :challenge_id => @challenge.id)
           end
-          remaining_points = available_points - total_points 
+          remaining_points = available_points - individual_points.to_i 
           if current_user.points_at_stake != "0"
-            stake_points = current_user.points_at_stake + total_points
+            stake_points = current_user.points_at_stake + individual_points.to_i
           else
             stake_points = current_user.points_at_stake   
           end

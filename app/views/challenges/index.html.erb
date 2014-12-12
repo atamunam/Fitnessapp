@@ -1,8 +1,8 @@
 <h1>Listing Your challenges</h1>
 <% if !@challenges.blank? %>
 <% @challenges.each do |challenge| %>
- <h3> <%= challenge.title %> ,
-<%= challenge.points %> points each </h3>
+ <h3>Title: <%= challenge.title %> </br>
+ Reward Points: <%= challenge.points %>  </h3>
  <% connected_users = UserChallenge.where(:challenge_id => challenge.id) %>
  <% if !connected_users.blank? %>
  <table>
@@ -20,21 +20,27 @@
  <tr>
     <td><%= user.username if user.username.present? %></td>
     <td>
-    <% if participant.is_approved == false %>
+
+    <% if participant.is_active == false && participant.is_approved == true %>
+      Winner
+    <% elsif participant.is_active == false && participant.is_approved == false %>
       Lost
-    <% elsif participant.is_approved == true %>
-      Won
-    <% elsif participant.is_accepted == false %>
-      Rejected 
-    <% elsif participant.is_accepted == true && participant.is_completed == 'nil' %>
+    <% elsif participant.is_active == nil && participant.is_approved == false %>
+      Did not win
+    <% elsif participant.is_accepted == true && participant.is_completed == true && participant.is_active == false %>
+      Lost
+    <% elsif participant.is_accepted == true && participant.is_completed == true && participant.is_active == nil %>
+
+    <%= link_to 'Approve' , approve_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
+    <%= link_to 'Disapprove' , disapprove_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
+    <% elsif participant.is_accepted == true && participant.is_completed == nil %>
       Accepted
-    <% elsif participant.is_accepted == true && participant.is_completed == true %>
-      <%= link_to 'Approve' , approve_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
-      <%= link_to 'Disapprove' , disapprove_challenge_users_path(:challenge_id => challenge.id, :competitor_id => participant.competitor_id) %>
-    
+    <% elsif participant.is_accepted == false %>
+      Rejected to join
     <% else %>
       Pending request to join
     <% end %>
+
     </td>
     </tr>
  <% end %>
